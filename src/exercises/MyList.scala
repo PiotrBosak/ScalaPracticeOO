@@ -1,10 +1,10 @@
 package exercises
 
-abstract sealed class MyList {
-  def head: Int
-  def tail : MyList
+abstract sealed class MyList[+A] {
+  def head: A
+  def tail : MyList[A]
   def isEmpty : Boolean
-  def add(n :Int) : MyList
+  def add[B >: A](element: B) : MyList[B]
 
   override def toString: String  = "[" + printElements() + "]"
   def printElements():String
@@ -13,19 +13,19 @@ abstract sealed class MyList {
 }
 
 
-object EmptyList extends MyList {
-  def head: Int = throw new NoSuchElementException
-  def tail: MyList = throw new NoSuchElementException
+object EmptyList extends MyList[Nothing] {
+  def tail: MyList[Nothing] = throw new NoSuchElementException
   override def isEmpty: Boolean = true
   def printElements() = ""
+  override def head: Nothing = throw new UnsupportedOperationException
 
-  override def add(n: Int): MyList = new NonEmptyList(n,EmptyList)
+  override def add[B >: Nothing](element: B): MyList[B] = new NonEmptyList[B](element,EmptyList)
 }
 
-class NonEmptyList(val h: Int,val t: MyList) extends MyList {
-  override def head: Int = h
+class NonEmptyList[A](val h: A,val t: MyList[A]) extends MyList[A] {
+  override def head: A = h
 
-  override def tail: MyList = t
+  override def tail: MyList[A] = t
   override def isEmpty: Boolean = false
 
   override def printElements(): String =
@@ -33,7 +33,7 @@ class NonEmptyList(val h: Int,val t: MyList) extends MyList {
     else h + ", " +t.printElements()
 
 
-  override def add(n: Int): MyList = new NonEmptyList(n,this)
+  override def add[B >: A](n: B): MyList[B] = new NonEmptyList(n,this)
 }
 
 object Run extends App{
