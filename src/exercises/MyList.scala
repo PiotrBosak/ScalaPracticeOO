@@ -34,7 +34,7 @@ abstract sealed class MyList[+A] {
 }
 
 
-object EmptyList extends MyList[Nothing] {
+case object EmptyList extends MyList[Nothing] {
   def tail: MyList[Nothing] = throw new NoSuchElementException
 
   override def isEmpty: Boolean = true
@@ -54,7 +54,7 @@ object EmptyList extends MyList[Nothing] {
 
 }
 
-class NonEmptyList[A](val h: A, val t: MyList[A]) extends MyList[A] {
+case class NonEmptyList[A]( h: A, t: MyList[A]) extends MyList[A] {
   override def head: A = h
 
   override def ++[B >: A](list: MyList[B]): MyList[B] = new NonEmptyList(h, tail ++ list)
