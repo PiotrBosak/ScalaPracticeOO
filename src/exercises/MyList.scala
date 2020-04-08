@@ -1,5 +1,7 @@
 package exercises
 
+import scala.collection.immutable.Stream.Cons
+
 
 trait MyPredicate[-T] {
   def test(elem: T): Boolean
@@ -9,11 +11,6 @@ trait MyPredicate[-T] {
 trait MyTransformer[-A, B] {
   def transform(elem: A): B
 }
-
-//MyList:
-//map(transformer) => MyList
-//filter(MyPredicate) => MyList
-//flatMap(Transformet from A to MyList[B] => MyList[B]
 
 
 
@@ -31,6 +28,8 @@ abstract sealed class MyList[+A] {
   def printElements(): String
   def filter(predicate: MyPredicate[A]): MyList[A]
   def map[B](transformer: MyTransformer[A,B]) : MyList[B]
+  def flatMap[B](transformer: MyTransformer[A,MyList[B]]) : MyList[B]
+  def ++[B >: A](list: MyList[B]): MyList[B]
 
 }
 
@@ -50,10 +49,15 @@ object EmptyList extends MyList[Nothing] {
 
   override def filter(predicate: MyPredicate[Nothing]): MyList[Nothing] = EmptyList
 
+  override def flatMap[B](transformer: MyTransformer[Nothing, MyList[B]]): MyList[B] = EmptyList
+   override def ++[B >: Nothing](list: MyList[B]): MyList[B] = list
+
 }
 
 class NonEmptyList[A](val h: A, val t: MyList[A]) extends MyList[A] {
   override def head: A = h
+
+  override def ++[B >: A](list: MyList[B]): MyList[B] = new NonEmptyList(h, tail ++ list)
 
   override def tail: MyList[A] = t
 
@@ -73,29 +77,37 @@ class NonEmptyList[A](val h: A, val t: MyList[A]) extends MyList[A] {
 
 
 
-//
-//    if(!isEmpty){
-//    if(predicate.test(h)) tail.test(predicate).add(h)
-//    else tail.test(predicate)
-//    }
-//    else this
-
-
   override def map[B](transformer: MyTransformer[A, B]): MyList[B] = {
     new NonEmptyList[B](transformer.transform(h),tail.map(transformer))
   }
-}
+
+  override def flatMap[B](transformer: MyTransformer[A, MyList[B]]): MyList[B] =
+    transformer.transform(h) ++ t.flatMap(transformer)
+  }
+
+
+
 
 object Run extends App {
-  val list = new NonEmptyList(1, EmptyList)
-  val list2 = list.add(3).add(3).add(5).add(4).add(4)
+  val list = new NonEmptyList(1, new NonEmptyList(7,EmptyList))
+  val list2 = new NonEmptyList(5,new NonEmptyList(3,EmptyList))
   val evenPredicate = new EvenPredicate
   val evenList = list2.filter(evenPredicate)
   print(evenList.toString)
+  val newList = list ++ list2
+  val flatList = newList.flatMap(new IncTransformer)
+  print(flatList.toString)
+
 
   class EvenPredicate extends MyPredicate[Int]{
     override def test(elem: Int): Boolean = elem%2 == 0
   }
+
+  class IncTransformer extends MyTransformer[Int,MyList[Int]]{
+    override def transform(elem: Int): MyList[Int] = new NonEmptyList[Int](elem,new NonEmptyList(elem+1,EmptyList))
+  }
+
+
 
 
 
