@@ -111,13 +111,6 @@ case class NonEmptyList[A](h: A, t: MyList[A]) extends MyList[A] {
     insert(h, sortedTail)
   }
 
-  //
-  //  def helperMethod[B](result: MyList[B], list:MyList[A]): MyList[B] = {
-  //    if (isEmpty)
-  //      result
-  //    else
-  //      helperMethod(result.add(function(h, list.head)), list.tail)
-  //  }
   override def zipWith[B, C](list: MyList[B], zip: (A, B) => C): MyList[C] = {
     if (list.isEmpty) throw new RuntimeException();
     NonEmptyList(zip(h, list.head), t.zipWith(list.tail, zip))

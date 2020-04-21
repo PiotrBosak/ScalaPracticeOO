@@ -17,6 +17,19 @@ object WhatsAFunction extends App {
   val first = fancyFunction(3)(5)// curried function
   println(first)
 
+
+  def toCurry(f: (Int,Int) => Int): (Int => Int => Int) =
+    x => y => f(x,y)
+
+  def fromCurry(f: (Int => Int => Int)) : (Int,Int) => Int =
+    (x,y) => f(x)(y)
+  def compose(f: Int => Int,g: Int=> Int): Int => Int =
+     x => f(g(x))
+
 }
+
+
+
+
 
 
