@@ -132,8 +132,7 @@ case class NonEmptyList[A](h: A, t: MyList[A]) extends MyList[A] {
     val flatList = newList.flatMap(e => NonEmptyList(e, NonEmptyList(e + 1, EmptyList)))
     //  println(flatList)
     flatList.foreach(x => println(x))
-    val zippedList = list.zipWith(list2, (e, f) => e * f)
-    println(zippedList)
+
 
 
   }
