@@ -74,6 +74,7 @@ val newSeq = aSequence.flatMap(e => Seq(e,e*2))
         val newMax: String = if (network(currentPerson).size > network(maxPerson).size) currentPerson else maxPerson
         aux(networkAcc.tail,newMax)
       }
+
     }
     aux(network,network.head._1)
   }
